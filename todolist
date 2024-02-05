@@ -1,0 +1,115 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class Todo {
+  String task;
+  bool isCompleted;
+
+  Todo(this.task, this.isCompleted);
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'To-Do List',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: TodoListScreen(),
+    );
+  }
+}
+
+class TodoListScreen extends StatefulWidget {
+  @override
+  _TodoListScreenState createState() => _TodoListScreenState();
+}
+
+class _TodoListScreenState extends State<TodoListScreen> {
+  List<Todo> todos = [];
+
+  TextEditingController _taskController = TextEditingController();
+
+  void _addTodo() {
+    if (_taskController.text.isNotEmpty) {
+      setState(() {
+        todos.add(Todo(_taskController.text, false));
+        _taskController.clear();
+      });
+    }
+  }
+
+  void _toggleTodoCompletion(int index) {
+    setState(() {
+      todos[index].isCompleted = !todos[index].isCompleted;
+    });
+  }
+
+  void _removeTodo(int index) {
+    setState(() {
+      todos.removeAt(index);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('To-Do List'),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _taskController,
+                    decoration: InputDecoration(
+                      hintText: 'Enter a task',
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: _addTodo,
+                  child: Text('Add'),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: todos.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(
+                    todos[index].task,
+                    style: TextStyle(
+                      decoration: todos[index].isCompleted
+                          ? TextDecoration.lineThrough
+                          : null,
+                    ),
+                  ),
+                  leading: Checkbox(
+                    value: todos[index].isCompleted,
+                    onChanged: (value) => _toggleTodoCompletion(index),
+                  ),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () => _removeTodo(index),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
